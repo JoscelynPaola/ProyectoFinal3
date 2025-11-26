@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace ProyectoFinal3
@@ -8,6 +10,10 @@ namespace ProyectoFinal3
         //Dictionary<string, string> estudiantes = new Dictionary<string, string>();
 
         public Estudiante raiz = null;
+
+        public Estudiante estudianteEditar = null;
+
+        public ordenListadoEstudiantes ordenEstudiantes = ordenListadoEstudiantes.inorden;
         public Form1()
         {
             InitializeComponent();
@@ -15,7 +21,19 @@ namespace ProyectoFinal3
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            foreach (talleres item in Enum.GetValues(typeof(talleres)))
+            {
+                cmbTalleres.Items.Add(item);
+            }
+            foreach (ordenListadoEstudiantes item in Enum.GetValues(typeof(ordenListadoEstudiantes)))
+            {
+                cmbOrdenEstudiantes.Items.Add(item);
+            }
+            cmbOrdenEstudiantes.SelectedIndex = 0;
+            foreach (materias item in Enum.GetValues(typeof(materias)))
+            {
+                cmbMaterias.Items.Add(item);
+            }
         }
 
         //public void crearListaEstudiantes()
@@ -108,8 +126,9 @@ namespace ProyectoFinal3
         public void agregarEstudiante()
         {
             Estudiante nuevo = new Estudiante();
-            nuevo.nombre = "Juan Perez";
-            nuevo.matricula = "a1";
+            nuevo.matricula = txtMatriculaAgregar.Text;
+            nuevo.nombre = txtNombreAgregar.Text;
+
             if (raiz == null)
             {
                 raiz = nuevo;
@@ -118,6 +137,11 @@ namespace ProyectoFinal3
             {
                 agregarEstudianteRecursivo(raiz, nuevo);
             }
+
+            txtMatriculaAgregar.Text = string.Empty;
+            txtNombreAgregar.Text = string.Empty;
+            txtMatriculaAgregar.Focus();
+            ListarEstudiantes();
         }
 
         public void agregarEstudianteRecursivo(Estudiante _nodo, Estudiante _nuevo)
@@ -155,10 +179,122 @@ namespace ProyectoFinal3
             }
         }
 
+        public void ListarEstudiantes()
+        {
+            if (raiz != null)
+            {
+                lbxEstudiantes.Items.Clear();
+                switch (ordenEstudiantes)
+                {
+                    case ordenListadoEstudiantes.inorden:
+                        ListarEstudiantesInordenRecursivo(raiz, lbxEstudiantes);
+                        break;
+
+                    case ordenListadoEstudiantes.preorden:
+
+                        break;
+
+                    case ordenListadoEstudiantes.posorden:
+
+                        break;
+                }
+
+            }
+        }
+
+        public void ListarEstudiantesInordenRecursivo(Estudiante _nodo, ListBox _lbx)
+        {
+            if (_nodo.izquierdo != null)
+            {
+                ListarEstudiantesInordenRecursivo(_nodo.izquierdo, _lbx);
+            }
+            else if (_nodo.derecho != null)
+            {
+                ListarEstudiantesInordenRecursivo(_nodo.derecho, _lbx);
+            }
+            else 
+            {
+                _lbx.Items.Add(_nodo.matricula + " => " + _nodo.nombre);
+            }
+            
+            
+        }
+
+        public void unionTalleresEstudiantes()
+        {
+            if(raiz != null)
+            {                
+                lbxUnionTalleres.Items.Clear();
+                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();                
+                unionTalleresEstudiantesRecursivo(raiz, ref segmentoTalleres);
+                foreach (talleres item in segmentoTalleres)
+                {
+                    lbxUnionTalleres.Items.Add(item);
+                }
+            }
+        }
+        public void unionTalleresEstudiantesRecursivo(Estudiante _nodo, ref HashSet<talleres> _segmentoTalleres)
+        {
+            _segmentoTalleres.UnionWith(_nodo.talleresInscritos);
+            if (_nodo.izquierdo != null)
+            {
+                unionTalleresEstudiantesRecursivo(_nodo.izquierdo, ref _segmentoTalleres);
+            }
+            if (_nodo.derecho != null)
+            {
+                unionTalleresEstudiantesRecursivo(_nodo.derecho, ref _segmentoTalleres);
+            }
+        }
+
+        public void InterseccionTalleresEstudiantes()
+        {
+            if (raiz != null)
+            {
+                lbxInterseccionTalleres.Items.Clear();
+                InterseccionTalleresEstudiantesRecursivo(raiz, lbxInterseccionTalleres);
+            }
+        }
+        public void InterseccionTalleresEstudiantesRecursivo(Estudiante _nodo, ListBox _lbx)
+        {
+
+        }
+
+
+        public void DiferencTalleresEstudiantes()
+        {
+            if (raiz != null)
+            {
+                lbxDiferenciaTalleres.Items.Clear();
+                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();
+                foreach (talleres item in Enum.GetValues(typeof(talleres)))
+                {
+                    segmentoTalleres.Add(item);
+                }
+                DiferencTalleresEstudiantesRecursivo(raiz, ref segmentoTalleres);
+
+                foreach (talleres item in segmentoTalleres)
+                {
+                    lbxDiferenciaTalleres.Items.Add(item);
+                }
+            }
+        }
+        public void DiferencTalleresEstudiantesRecursivo(Estudiante _nodo, ref HashSet<talleres> _segmentoTalleres)
+        {
+            _segmentoTalleres.ExceptWith(_nodo.talleresInscritos);
+            if (_nodo.izquierdo != null)
+            {
+                DiferencTalleresEstudiantesRecursivo(_nodo.izquierdo, ref _segmentoTalleres);
+            }
+            if (_nodo.derecho != null)
+            {
+                DiferencTalleresEstudiantesRecursivo(_nodo.derecho, ref _segmentoTalleres);
+            }
+        }
+
         public Estudiante buscarEstudiante()
         {
             Estudiante estudiante = new Estudiante();
-            estudiante.matricula = textBox1.Text;
+            estudiante.matricula = txtMatriculaBuscar.Text;
 
             return buscarEstudianteRecursivo(raiz, estudiante);
         }
@@ -187,9 +323,9 @@ namespace ProyectoFinal3
             _nodo.agregarMateria("Historia", 9);
         }
 
-        public void asignarTalleresEstudiante(Estudiante _nodo, talleres taller)
+        public void asignarTalleresEstudiante(Estudiante _nodo, talleres item)
         {
-            _nodo.agregarTaller(taller);
+            _nodo.agregarTaller(item);
         }
 
         public void promedioEstudiante(Estudiante _nodo)
@@ -199,12 +335,164 @@ namespace ProyectoFinal3
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Estudiante estudianteEncontrado = buscarEstudiante();
-            if(estudianteEncontrado != null)
+            estudianteEditar = buscarEstudiante();
+            if (estudianteEditar != null)
             {
-                asignarMateriasEstudiante(estudianteEncontrado);
-                asignarTalleresEstudiante(estudianteEncontrado, talleres.futbol);
+                txtNombreBuscar.Text = estudianteEditar.nombre;
+                cmbTalleres.SelectedItem = null;
+                cmbMaterias.SelectedItem = null;
+
+                ListarTalleresEstudiante();
+                ListarMateriasEstudiante();
             }
+        }
+
+        public void ListarTalleresEstudiante()
+        {
+            lbxTalleresEstudiante.Items.Clear();
+            if (estudianteEditar.talleresInscritos.Count > 0)
+            {
+                foreach (talleres item in estudianteEditar.talleresInscritos)
+                {
+                    lbxTalleresEstudiante.Items.Add(item);
+                }
+            }
+        }
+
+        public void ListarMateriasEstudiante()
+        {
+            lblPromedioEstudiante.Text = string.Empty;
+            lbxMateriasEstudiante.Items.Clear();
+            if (estudianteEditar.materias.Count > 0)
+            {
+                foreach (KeyValuePair<string, double> item in estudianteEditar.materias)
+                {
+                    lbxMateriasEstudiante.Items.Add(item.Key + ": " + item.Value);
+                }
+                lblPromedioEstudiante.Text = estudianteEditar.promedioMaterias().ToString();
+            }
+        }
+
+        private void btnAgregarEstudiante_Click(object sender, EventArgs e)
+        {
+            agregarEstudiante();
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            if (cmbTalleres.SelectedItem != null)
+            {
+                if (estudianteEditar != null)
+                {
+                    talleres item;
+                    Enum.TryParse(cmbTalleres.SelectedItem.ToString(), out item);
+                    estudianteEditar.agregarTaller(item);
+                    ListarTalleresEstudiante();
+
+                    unionTalleresEstudiantes();
+
+                    DiferencTalleresEstudiantes();
+                }
+            }
+        }
+
+        private void cmbOrdenEstudiantes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Enum.TryParse(cmbOrdenEstudiantes.SelectedIndex.ToString(), out ordenEstudiantes);
+            ListarEstudiantes();
+        }
+
+        private void btnAgregarMateria_Click(object sender, EventArgs e)
+        {
+            bool contieneItem = Enum.IsDefined(typeof(materias), txtNombreMateria.Text);
+            if (!contieneItem)
+            {
+                cmbMaterias.Items.Add(txtNombreMateria.Text);
+                txtNombreMateria.Text = string.Empty;
+                txtNombreMateria.Focus();
+            }
+        }
+
+        private void btnAgregarMateriaEstudiante_Click(object sender, EventArgs e)
+        {
+            if (cmbMaterias.SelectedItem != null)
+            {
+                if (estudianteEditar != null)
+                {
+                    estudianteEditar.agregarMateria(cmbMaterias.SelectedItem.ToString(), 0);
+                    ListarMateriasEstudiante();
+                }
+            }
+        }
+
+        private void lbxMateriasEstudiante_DoubleClick(object sender, EventArgs e)
+        {
+            if (lbxMateriasEstudiante.SelectedItem != null)
+            {
+                if (estudianteEditar != null)
+                {
+                    string materia = lbxMateriasEstudiante.SelectedItem.ToString().Substring(0, lbxMateriasEstudiante.SelectedItem.ToString().IndexOf(":"));
+                    string strCalificacion = string.Empty;
+                    DialogResult decision = m_inputBox("Calificación", "Indique la calificación de la materia: " + materia, ref strCalificacion);
+                    if (decision == DialogResult.OK)
+                    {
+                        double calificacion = 0;
+                        double.TryParse(strCalificacion, out calificacion);
+
+                        if (calificacion > 0)
+                        {
+                            estudianteEditar.modificarCalificacion(materia, calificacion);
+                            ListarMateriasEstudiante();
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        public DialogResult m_inputBox(string _title, string _promptText, ref string _value)
+        {
+            System.Windows.Forms.Form form = new System.Windows.Forms.Form();
+            System.Windows.Forms.Label label = new System.Windows.Forms.Label();
+            System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.Button
+                buttonOk = new System.Windows.Forms.Button(),
+                buttonCancel = new System.Windows.Forms.Button();
+            DialogResult dialogResult;
+
+            form.Text = _title;
+            label.Text = _promptText;
+            textBox.Text = _value;
+
+            buttonOk.Text = "Aceptar";
+            buttonCancel.Text = "Cancelar";
+            buttonOk.DialogResult = DialogResult.OK;
+            buttonCancel.DialogResult = DialogResult.Cancel;
+
+            label.SetBounds(9, 20, 372, 13);
+            textBox.SetBounds(12, 36, 372, 20);
+            buttonOk.SetBounds(228, 72, 75, 23);
+            buttonCancel.SetBounds(309, 72, 75, 23);
+
+            label.AutoSize = true;
+            textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
+            buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            form.ClientSize = new Size(396, 107);
+            form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
+            form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
+            form.AcceptButton = buttonOk;
+            form.CancelButton = buttonCancel;
+
+            dialogResult = form.ShowDialog();
+            _value = (!string.IsNullOrEmpty(textBox.Text)) ? textBox.Text : string.Empty;
+            return dialogResult;
         }
     }
 }

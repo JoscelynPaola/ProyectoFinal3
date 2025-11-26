@@ -16,7 +16,7 @@ namespace ProyectoFinal3
         public Estudiante izquierdo { get; set; }
         public Estudiante derecho { get; set; }
 
-        public Dictionary<string, int> materias { get; set; }
+        public Dictionary<string, double> materias { get; set; }
 
         public HashSet<talleres> talleresInscritos { get; set; }
 
@@ -24,7 +24,7 @@ namespace ProyectoFinal3
         {
             izquierdo = null;
             derecho = null;
-            materias = new Dictionary<string, int>();
+            materias = new Dictionary<string, double>();
             talleresInscritos = new HashSet<talleres>();            
         }
         public void agregarMateria(string nombreMateria, int calificacion)
@@ -36,7 +36,7 @@ namespace ProyectoFinal3
         {
             materias.Remove(nombreMateria);
         }
-        public void modificarCalificacion(string nombreMateria, int nuevaCalificacion)
+        public void modificarCalificacion(string nombreMateria, double nuevaCalificacion)
         {
             if (materias.ContainsKey(nombreMateria))
             {
@@ -47,7 +47,7 @@ namespace ProyectoFinal3
         {
             if (materias.ContainsKey(nombreMateria))
             {
-                int calificacion = materias[nombreMateria];
+                double calificacion = materias[nombreMateria];
                 materias.Remove(nombreMateria);
                 materias.Add(nuevoNombre, calificacion);
             }

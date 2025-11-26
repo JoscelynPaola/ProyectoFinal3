@@ -12,6 +12,20 @@ namespace ProyectoFinal3
         ajedrez,
         danza,
         basquetbol,
-        voleibol,
+        voleibol
+    }
+
+    public enum materias
+    {
+        programacion,
+        ingles,
+        redes
+    }
+
+    public enum ordenListadoEstudiantes
+    {
+        inorden = 0,
+        preorden = 1,
+        posorden = 2
     }
 }
