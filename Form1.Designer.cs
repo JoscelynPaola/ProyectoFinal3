@@ -406,6 +406,7 @@
             // lbxInterseccionTalleres
             // 
             lbxInterseccionTalleres.FormattingEnabled = true;
+            lbxInterseccionTalleres.HorizontalScrollbar = true;
             lbxInterseccionTalleres.ItemHeight = 15;
             lbxInterseccionTalleres.Location = new Point(288, 63);
             lbxInterseccionTalleres.Name = "lbxInterseccionTalleres";

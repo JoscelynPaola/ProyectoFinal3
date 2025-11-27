@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Configuration.Internal;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -89,8 +90,8 @@ namespace ProyectoFinal3
         //    Console.WriteLine("Unión: " + string.Join(", ", union2));
 
         //    // Intersección (valores comunes entre 2 conjuntos)
-        //    HashSet<int> interseccion = new HashSet<int>(A);
-        //    interseccion.IntersectWith(B);
+        //    HashSet<int> interseccion = new HashSet<int>(A);//catalogo
+        //    interseccion.IntersectWith(B);//talleres estudiante
         //    Console.WriteLine("Intersección: " + string.Join(", ", interseccion));
 
 
@@ -181,51 +182,60 @@ namespace ProyectoFinal3
 
         public void ListarEstudiantes()
         {
-            if (raiz != null)
+            lbxEstudiantes.Items.Clear();
+            switch (ordenEstudiantes)
             {
-                lbxEstudiantes.Items.Clear();
-                switch (ordenEstudiantes)
-                {
-                    case ordenListadoEstudiantes.inorden:
-                        ListarEstudiantesInordenRecursivo(raiz, lbxEstudiantes);
-                        break;
+                case ordenListadoEstudiantes.inorden:
+                    ListarEstudiantesInordenRecursivo(raiz, lbxEstudiantes);
+                    break;
 
-                    case ordenListadoEstudiantes.preorden:
+                case ordenListadoEstudiantes.preorden:
+                    ListarEstudiantesPreordenRecursivo(raiz, lbxEstudiantes);
+                    break;
 
-                        break;
-
-                    case ordenListadoEstudiantes.posorden:
-
-                        break;
-                }
-
+                case ordenListadoEstudiantes.posorden:
+                    ListarEstudiantesPosordenRecursivo(raiz, lbxEstudiantes);
+                    break;
             }
         }
 
         public void ListarEstudiantesInordenRecursivo(Estudiante _nodo, ListBox _lbx)
         {
-            if (_nodo.izquierdo != null)
+            if (_nodo != null)
             {
                 ListarEstudiantesInordenRecursivo(_nodo.izquierdo, _lbx);
-            }
-            else if (_nodo.derecho != null)
-            {
+                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);
                 ListarEstudiantesInordenRecursivo(_nodo.derecho, _lbx);
             }
-            else 
-            {
-                _lbx.Items.Add(_nodo.matricula + " => " + _nodo.nombre);
-            }
-            
-            
         }
+
+        public void ListarEstudiantesPreordenRecursivo(Estudiante _nodo, ListBox _lbx)
+        {
+            if (_nodo != null)
+            {
+                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);
+                ListarEstudiantesPreordenRecursivo(_nodo.izquierdo, _lbx);
+                ListarEstudiantesPreordenRecursivo(_nodo.derecho, _lbx);
+            }
+        }
+
+        public void ListarEstudiantesPosordenRecursivo(Estudiante _nodo, ListBox _lbx)
+        {
+            if (_nodo != null)
+            {
+                ListarEstudiantesPosordenRecursivo(_nodo.izquierdo, _lbx);
+                ListarEstudiantesPosordenRecursivo(_nodo.derecho, _lbx);
+                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);
+            }
+        }
+
 
         public void unionTalleresEstudiantes()
         {
-            if(raiz != null)
-            {                
+            if (raiz != null)
+            {
                 lbxUnionTalleres.Items.Clear();
-                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();                
+                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();
                 unionTalleresEstudiantesRecursivo(raiz, ref segmentoTalleres);
                 foreach (talleres item in segmentoTalleres)
                 {
@@ -251,12 +261,34 @@ namespace ProyectoFinal3
             if (raiz != null)
             {
                 lbxInterseccionTalleres.Items.Clear();
-                InterseccionTalleresEstudiantesRecursivo(raiz, lbxInterseccionTalleres);
+                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();
+                foreach (talleres item in Enum.GetValues(typeof(talleres)))
+                {
+                    segmentoTalleres.Add(item);
+                }
+                HashSet<talleres> segmentoTalleresInterseccion = new HashSet<talleres>();
+                InterseccionTalleresEstudiantesRecursivo(raiz, segmentoTalleres, ref segmentoTalleresInterseccion);
+
+                foreach (var item in segmentoTalleresInterseccion)
+                {
+                    string listadoEstudiantesTaller = string.Empty;
+                    buscarEstudiantesPorTaller(raiz, item, ref listadoEstudiantesTaller);
+                    lbxInterseccionTalleres.Items.Add(item + " => " + listadoEstudiantesTaller);
+                }
             }
         }
-        public void InterseccionTalleresEstudiantesRecursivo(Estudiante _nodo, ListBox _lbx)
+        public void InterseccionTalleresEstudiantesRecursivo(Estudiante _nodo, HashSet<talleres> _segmentoTalleres, ref HashSet<talleres> _segmentoTalleresInterseccion)
         {
-
+            _segmentoTalleresInterseccion = new HashSet<talleres>(_segmentoTalleres);
+            _segmentoTalleresInterseccion.IntersectWith(_nodo.talleresInscritos);
+            if (_nodo.izquierdo != null)
+            {
+                InterseccionTalleresEstudiantesRecursivo(_nodo.izquierdo, _segmentoTalleres, ref _segmentoTalleresInterseccion);
+            }
+            if (_nodo.derecho != null)
+            {
+                InterseccionTalleresEstudiantesRecursivo(_nodo.derecho, _segmentoTalleres, ref _segmentoTalleresInterseccion);
+            }
         }
 
 
@@ -288,6 +320,22 @@ namespace ProyectoFinal3
             if (_nodo.derecho != null)
             {
                 DiferencTalleresEstudiantesRecursivo(_nodo.derecho, ref _segmentoTalleres);
+            }
+        }
+
+        public void buscarEstudiantesPorTaller(Estudiante _nodo, talleres _taller, ref string _listaEstudiantes)
+        {
+            if(_nodo.talleresInscritos.Contains(_taller))
+            {
+                _listaEstudiantes += _nodo.matricula + " => " + _nodo.nombre + " --- ";
+            }
+            if (_nodo.izquierdo != null)
+            {
+                buscarEstudiantesPorTaller(_nodo.izquierdo, _taller, ref _listaEstudiantes);
+            }
+            if (_nodo.derecho != null)
+            {
+                buscarEstudiantesPorTaller(_nodo.derecho, _taller, ref _listaEstudiantes);
             }
         }
 
@@ -390,7 +438,7 @@ namespace ProyectoFinal3
                     ListarTalleresEstudiante();
 
                     unionTalleresEstudiantes();
-
+                    InterseccionTalleresEstudiantes();
                     DiferencTalleresEstudiantes();
                 }
             }
