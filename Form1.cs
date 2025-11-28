@@ -261,34 +261,32 @@ namespace ProyectoFinal3
             if (raiz != null)
             {
                 lbxInterseccionTalleres.Items.Clear();
-                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();//CREAR UN HASHSET PARA ALMACENAR LOS TALLERES
-                foreach (talleres item in Enum.GetValues(typeof(talleres)))//AGREGAR TODOS LOS TALLERES AL HASHSET
-                {
-                    segmentoTalleres.Add(item);//AGREGAR EL TALLER AL HASHSET
-                }
-                HashSet<talleres> segmentoTalleresInterseccion = new HashSet<talleres>();//CREAR UN HASHSET PARA ALMACENAR LA INTERSECCION DE TALLERES
-                InterseccionTalleresEstudiantesRecursivo(raiz, segmentoTalleres, ref segmentoTalleresInterseccion);
 
-                foreach (var item in segmentoTalleresInterseccion)//RECORRER LA INTERSECCION DE TALLERES
+                // 1° inicializar intersección con TODOS los talleres
+                HashSet<talleres> interseccion = new HashSet<talleres>(
+                    Enum.GetValues(typeof(talleres)).Cast<talleres>()
+                );
+
+                // 2° llamar al recursivo
+                InterseccionRecursivo(raiz, interseccion);
+
+                // 3° mostrar solo si hay intersección
+                foreach (var item in interseccion)
                 {
-                    string listadoEstudiantesTaller = string.Empty;
-                    buscarEstudiantesPorTaller(raiz, item, ref listadoEstudiantesTaller);//BUSCAR LOS ESTUDIANTES INSCRITOS EN EL TALLER
-                    lbxInterseccionTalleres.Items.Add(item + " => " + listadoEstudiantesTaller);
+                    string listado = "";
+                    buscarEstudiantesPorTaller(raiz, item, ref listado);
+                    lbxInterseccionTalleres.Items.Add(item + " => " + listado);
                 }
             }
         }
-        public void InterseccionTalleresEstudiantesRecursivo(Estudiante _nodo, HashSet<talleres> _segmentoTalleres, ref HashSet<talleres> _segmentoTalleresInterseccion)//funcion recursiva para obtener la interseccion de talleres inscritos por los estudiantes
+        private void InterseccionRecursivo(Estudiante nodo, HashSet<talleres> interseccion)
         {
-            _segmentoTalleresInterseccion = new HashSet<talleres>(_segmentoTalleres);//CREAR UN NUEVO HASHSET PARA ALMACENAR LA INTERSECCION
-            _segmentoTalleresInterseccion.IntersectWith(_nodo.talleresInscritos);//INTERSECCION DE TALLERES INSCRITOS POR EL ESTUDIANTE ACTUAL
-            if (_nodo.izquierdo != null)
-            {
-                InterseccionTalleresEstudiantesRecursivo(_nodo.izquierdo, _segmentoTalleres, ref _segmentoTalleresInterseccion);//LLAMAR RECURSIVAMENTE AL NODO IZQUIERDO
-            }
-            if (_nodo.derecho != null)
-            {
-                InterseccionTalleresEstudiantesRecursivo(_nodo.derecho, _segmentoTalleres, ref _segmentoTalleresInterseccion);//LLAMAR RECURSIVAMENTE AL NODO DERECHO
-            }
+            if (nodo == null) return;
+
+            interseccion.IntersectWith(nodo.talleresInscritos);
+
+            InterseccionRecursivo(nodo.izquierdo, interseccion);
+            InterseccionRecursivo(nodo.derecho, interseccion);
         }
 
 
