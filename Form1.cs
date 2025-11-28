@@ -10,28 +10,28 @@ namespace ProyectoFinal3
     {
         //Dictionary<string, string> estudiantes = new Dictionary<string, string>();
 
-        public Estudiante raiz = null;
+        public Estudiante raiz = null;//raiz del arbol binario
 
-        public Estudiante estudianteEditar = null;
+        public Estudiante estudianteEditar = null;//estudiante a editar
 
-        public ordenListadoEstudiantes ordenEstudiantes = ordenListadoEstudiantes.inorden;
+        public ordenListadoEstudiantes ordenEstudiantes = ordenListadoEstudiantes.inorden;//orden por defecto
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)//AL INICIAR EL FORMULARIO
         {
-            foreach (talleres item in Enum.GetValues(typeof(talleres)))
+            foreach (talleres item in Enum.GetValues(typeof(talleres)))//AGREGAR ITEMS AL COMBOBOX DE TALLERES
             {
                 cmbTalleres.Items.Add(item);
             }
-            foreach (ordenListadoEstudiantes item in Enum.GetValues(typeof(ordenListadoEstudiantes)))
+            foreach (ordenListadoEstudiantes item in Enum.GetValues(typeof(ordenListadoEstudiantes)))//AGREGAR ITEMS AL COMBOBOX DE ORDENAMIENTO
             {
                 cmbOrdenEstudiantes.Items.Add(item);
             }
             cmbOrdenEstudiantes.SelectedIndex = 0;
-            foreach (materias item in Enum.GetValues(typeof(materias)))
+            foreach (materias item in Enum.GetValues(typeof(materias)))//AGREGAR ITEMS AL COMBOBOX DE MATERIAS
             {
                 cmbMaterias.Items.Add(item);
             }
@@ -124,19 +124,19 @@ namespace ProyectoFinal3
         //    //numerosUnion = numerosUnion.OrderDescending<int>().ToList();
         //}
 
-        public void agregarEstudiante()
+        public void agregarEstudiante()//funcion para agregar estudiante al arbol binario
         {
             Estudiante nuevo = new Estudiante();
             nuevo.matricula = txtMatriculaAgregar.Text;
             nuevo.nombre = txtNombreAgregar.Text;
 
-            if (raiz == null)
+            if (raiz == null)//SI EL ARBOL ESTA VACIO, ASIGNAR LA RAIZ
             {
                 raiz = nuevo;
             }
             else
             {
-                agregarEstudianteRecursivo(raiz, nuevo);
+                agregarEstudianteRecursivo(raiz, nuevo);//SI NO, LLAMAR A LA FUNCION RECURSIVA PARA AGREGAR EL ESTUDIANTE
             }
 
             txtMatriculaAgregar.Text = string.Empty;
@@ -145,16 +145,16 @@ namespace ProyectoFinal3
             ListarEstudiantes();
         }
 
-        public void agregarEstudianteRecursivo(Estudiante _nodo, Estudiante _nuevo)
+        public void agregarEstudianteRecursivo(Estudiante _nodo, Estudiante _nuevo)//funcion recursiva para agregar estudiante al arbol binario
         {
             int resultComparacionMatriculas = String.Compare(_nodo.matricula, _nuevo.matricula, StringComparison.OrdinalIgnoreCase);
 
-            if (resultComparacionMatriculas == 0)
+            if (resultComparacionMatriculas == 0)//si ya existe la matricula
             {
                 MessageBox.Show("Error");
                 //mensaje error
             }
-            else if (resultComparacionMatriculas < 0)
+            else if (resultComparacionMatriculas < 0)//si a es menor que b
             {
                 //a es antes que b (izquierda)
                 if (_nodo.izquierdo == null)
@@ -175,134 +175,134 @@ namespace ProyectoFinal3
                 }
                 else
                 {
-                    agregarEstudianteRecursivo(_nodo.derecho, _nuevo);
+                    agregarEstudianteRecursivo(_nodo.derecho, _nuevo);//llamar recursivamente
                 }
             }
         }
 
-        public void ListarEstudiantes()
+        public void ListarEstudiantes()//funcion para listar estudiantes en el ListBox segun el orden seleccionado
         {
             lbxEstudiantes.Items.Clear();
             switch (ordenEstudiantes)
             {
-                case ordenListadoEstudiantes.inorden:
-                    ListarEstudiantesInordenRecursivo(raiz, lbxEstudiantes);
+                case ordenListadoEstudiantes.inorden://INORDEN
+                    ListarEstudiantesInordenRecursivo(raiz, lbxEstudiantes);//llamar a la funcion recursiva(inorden
                     break;
 
-                case ordenListadoEstudiantes.preorden:
-                    ListarEstudiantesPreordenRecursivo(raiz, lbxEstudiantes);
+                case ordenListadoEstudiantes.preorden://PREORDEN
+                    ListarEstudiantesPreordenRecursivo(raiz, lbxEstudiantes);//llamar a la funcion recursiva(preorden
                     break;
 
-                case ordenListadoEstudiantes.posorden:
-                    ListarEstudiantesPosordenRecursivo(raiz, lbxEstudiantes);
+                case ordenListadoEstudiantes.posorden://POSORDEN
+                    ListarEstudiantesPosordenRecursivo(raiz, lbxEstudiantes);//llamar a la funcion recursiva(posorden
                     break;
             }
         }
 
-        public void ListarEstudiantesInordenRecursivo(Estudiante _nodo, ListBox _lbx)
+        public void ListarEstudiantesInordenRecursivo(Estudiante _nodo, ListBox _lbx)//funcion recursiva para listar estudiantes en inorden
         {
             if (_nodo != null)
             {
-                ListarEstudiantesInordenRecursivo(_nodo.izquierdo, _lbx);
-                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);
-                ListarEstudiantesInordenRecursivo(_nodo.derecho, _lbx);
+                ListarEstudiantesInordenRecursivo(_nodo.izquierdo, _lbx);//llamar recursivamente al nodo izquierdo
+                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);//agregar el estudiante al ListBox
+                ListarEstudiantesInordenRecursivo(_nodo.derecho, _lbx);//llamar recursivamente al nodo derecho
             }
         }
 
-        public void ListarEstudiantesPreordenRecursivo(Estudiante _nodo, ListBox _lbx)
+        public void ListarEstudiantesPreordenRecursivo(Estudiante _nodo, ListBox _lbx)//funcion recursiva para listar estudiantes en preorden
         {
             if (_nodo != null)
             {
-                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);
-                ListarEstudiantesPreordenRecursivo(_nodo.izquierdo, _lbx);
-                ListarEstudiantesPreordenRecursivo(_nodo.derecho, _lbx);
+                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);//agregar el estudiante al ListBox
+                ListarEstudiantesPreordenRecursivo(_nodo.izquierdo, _lbx);//llamar recursivamente al nodo izquierdo
+                ListarEstudiantesPreordenRecursivo(_nodo.derecho, _lbx);//llamar recursivamente al nodo derecho
             }
         }
 
-        public void ListarEstudiantesPosordenRecursivo(Estudiante _nodo, ListBox _lbx)
+        public void ListarEstudiantesPosordenRecursivo(Estudiante _nodo, ListBox _lbx)//funcion recursiva para listar estudiantes en posorden
         {
             if (_nodo != null)
             {
-                ListarEstudiantesPosordenRecursivo(_nodo.izquierdo, _lbx);
-                ListarEstudiantesPosordenRecursivo(_nodo.derecho, _lbx);
-                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);
+                ListarEstudiantesPosordenRecursivo(_nodo.izquierdo, _lbx);//llamar recursivamente al nodo izquierdo
+                ListarEstudiantesPosordenRecursivo(_nodo.derecho, _lbx);//llamar recursivamente al nodo derecho
+                _lbx.Items.Insert(0, _nodo.matricula + " => " + _nodo.nombre);//agregar el estudiante al ListBox
             }
         }
 
 
-        public void unionTalleresEstudiantes()
+        public void unionTalleresEstudiantes()//metodo para obtener la union de talleres inscritos por los estudiantes
         {
-            if (raiz != null)
+            if (raiz != null)//SI LA RAIZ NO ES NULA
             {
                 lbxUnionTalleres.Items.Clear();
-                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();
-                unionTalleresEstudiantesRecursivo(raiz, ref segmentoTalleres);
+                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();//CREAR UN HASHSET PARA ALMACENAR LOS TALLERES
+                unionTalleresEstudiantesRecursivo(raiz, ref segmentoTalleres);//LLAMAR A LA FUNCION RECURSIVA PARA OBTENER LA UNION DE TALLERES
                 foreach (talleres item in segmentoTalleres)
                 {
                     lbxUnionTalleres.Items.Add(item);
                 }
             }
         }
-        public void unionTalleresEstudiantesRecursivo(Estudiante _nodo, ref HashSet<talleres> _segmentoTalleres)
+        public void unionTalleresEstudiantesRecursivo(Estudiante _nodo, ref HashSet<talleres> _segmentoTalleres)//funcion recursiva para obtener la union de talleres inscritos por los estudiantes
         {
-            _segmentoTalleres.UnionWith(_nodo.talleresInscritos);
+            _segmentoTalleres.UnionWith(_nodo.talleresInscritos);//UNION DE TALLERES INSCRITOS POR EL ESTUDIANTE ACTUAL
             if (_nodo.izquierdo != null)
             {
-                unionTalleresEstudiantesRecursivo(_nodo.izquierdo, ref _segmentoTalleres);
+                unionTalleresEstudiantesRecursivo(_nodo.izquierdo, ref _segmentoTalleres);//LLAMAR RECURSIVAMENTE AL NODO IZQUIERDO
             }
             if (_nodo.derecho != null)
             {
-                unionTalleresEstudiantesRecursivo(_nodo.derecho, ref _segmentoTalleres);
+                unionTalleresEstudiantesRecursivo(_nodo.derecho, ref _segmentoTalleres);//LLAMAR RECURSIVAMENTE AL NODO DERECHO
             }
         }
 
-        public void InterseccionTalleresEstudiantes()
+        public void InterseccionTalleresEstudiantes()//metodo para obtener la interseccion de talleres inscritos por los estudiantes
         {
             if (raiz != null)
             {
                 lbxInterseccionTalleres.Items.Clear();
-                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();
-                foreach (talleres item in Enum.GetValues(typeof(talleres)))
+                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();//CREAR UN HASHSET PARA ALMACENAR LOS TALLERES
+                foreach (talleres item in Enum.GetValues(typeof(talleres)))//AGREGAR TODOS LOS TALLERES AL HASHSET
                 {
-                    segmentoTalleres.Add(item);
+                    segmentoTalleres.Add(item);//AGREGAR EL TALLER AL HASHSET
                 }
-                HashSet<talleres> segmentoTalleresInterseccion = new HashSet<talleres>();
+                HashSet<talleres> segmentoTalleresInterseccion = new HashSet<talleres>();//CREAR UN HASHSET PARA ALMACENAR LA INTERSECCION DE TALLERES
                 InterseccionTalleresEstudiantesRecursivo(raiz, segmentoTalleres, ref segmentoTalleresInterseccion);
 
-                foreach (var item in segmentoTalleresInterseccion)
+                foreach (var item in segmentoTalleresInterseccion)//RECORRER LA INTERSECCION DE TALLERES
                 {
                     string listadoEstudiantesTaller = string.Empty;
-                    buscarEstudiantesPorTaller(raiz, item, ref listadoEstudiantesTaller);
+                    buscarEstudiantesPorTaller(raiz, item, ref listadoEstudiantesTaller);//BUSCAR LOS ESTUDIANTES INSCRITOS EN EL TALLER
                     lbxInterseccionTalleres.Items.Add(item + " => " + listadoEstudiantesTaller);
                 }
             }
         }
-        public void InterseccionTalleresEstudiantesRecursivo(Estudiante _nodo, HashSet<talleres> _segmentoTalleres, ref HashSet<talleres> _segmentoTalleresInterseccion)
+        public void InterseccionTalleresEstudiantesRecursivo(Estudiante _nodo, HashSet<talleres> _segmentoTalleres, ref HashSet<talleres> _segmentoTalleresInterseccion)//funcion recursiva para obtener la interseccion de talleres inscritos por los estudiantes
         {
-            _segmentoTalleresInterseccion = new HashSet<talleres>(_segmentoTalleres);
-            _segmentoTalleresInterseccion.IntersectWith(_nodo.talleresInscritos);
+            _segmentoTalleresInterseccion = new HashSet<talleres>(_segmentoTalleres);//CREAR UN NUEVO HASHSET PARA ALMACENAR LA INTERSECCION
+            _segmentoTalleresInterseccion.IntersectWith(_nodo.talleresInscritos);//INTERSECCION DE TALLERES INSCRITOS POR EL ESTUDIANTE ACTUAL
             if (_nodo.izquierdo != null)
             {
-                InterseccionTalleresEstudiantesRecursivo(_nodo.izquierdo, _segmentoTalleres, ref _segmentoTalleresInterseccion);
+                InterseccionTalleresEstudiantesRecursivo(_nodo.izquierdo, _segmentoTalleres, ref _segmentoTalleresInterseccion);//LLAMAR RECURSIVAMENTE AL NODO IZQUIERDO
             }
             if (_nodo.derecho != null)
             {
-                InterseccionTalleresEstudiantesRecursivo(_nodo.derecho, _segmentoTalleres, ref _segmentoTalleresInterseccion);
+                InterseccionTalleresEstudiantesRecursivo(_nodo.derecho, _segmentoTalleres, ref _segmentoTalleresInterseccion);//LLAMAR RECURSIVAMENTE AL NODO DERECHO
             }
         }
 
 
-        public void DiferencTalleresEstudiantes()
+        public void DiferencTalleresEstudiantes()//metodo para obtener la diferencia de talleres inscritos por los estudiantes
         {
             if (raiz != null)
             {
                 lbxDiferenciaTalleres.Items.Clear();
-                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();
-                foreach (talleres item in Enum.GetValues(typeof(talleres)))
+                HashSet<talleres> segmentoTalleres = new HashSet<talleres>();//CREAR UN HASHSET PARA ALMACENAR LOS TALLERES
+                foreach (talleres item in Enum.GetValues(typeof(talleres)))//AGREGAR TODOS LOS TALLERES AL HASHSET
                 {
                     segmentoTalleres.Add(item);
                 }
-                DiferencTalleresEstudiantesRecursivo(raiz, ref segmentoTalleres);
+                DiferencTalleresEstudiantesRecursivo(raiz, ref segmentoTalleres);//LLAMAR A LA FUNCION RECURSIVA PARA OBTENER LA DIFERENCIA DE TALLERES
 
                 foreach (talleres item in segmentoTalleres)
                 {
@@ -310,20 +310,20 @@ namespace ProyectoFinal3
                 }
             }
         }
-        public void DiferencTalleresEstudiantesRecursivo(Estudiante _nodo, ref HashSet<talleres> _segmentoTalleres)
+        public void DiferencTalleresEstudiantesRecursivo(Estudiante _nodo, ref HashSet<talleres> _segmentoTalleres)//funcion recursiva para obtener la diferencia de talleres inscritos por los estudiantes
         {
             _segmentoTalleres.ExceptWith(_nodo.talleresInscritos);
             if (_nodo.izquierdo != null)
             {
-                DiferencTalleresEstudiantesRecursivo(_nodo.izquierdo, ref _segmentoTalleres);
+                DiferencTalleresEstudiantesRecursivo(_nodo.izquierdo, ref _segmentoTalleres);//LLAMAR RECURSIVAMENTE AL NODO IZQUIERDO
             }
             if (_nodo.derecho != null)
             {
-                DiferencTalleresEstudiantesRecursivo(_nodo.derecho, ref _segmentoTalleres);
+                DiferencTalleresEstudiantesRecursivo(_nodo.derecho, ref _segmentoTalleres);//LLAMAR RECURSIVAMENTE AL NODO DERECHO
             }
         }
 
-        public void buscarEstudiantesPorTaller(Estudiante _nodo, talleres _taller, ref string _listaEstudiantes)
+        public void buscarEstudiantesPorTaller(Estudiante _nodo, talleres _taller, ref string _listaEstudiantes)//funcion recursiva para buscar estudiantes inscritos en un taller
         {
             if(_nodo.talleresInscritos.Contains(_taller))
             {
@@ -331,57 +331,57 @@ namespace ProyectoFinal3
             }
             if (_nodo.izquierdo != null)
             {
-                buscarEstudiantesPorTaller(_nodo.izquierdo, _taller, ref _listaEstudiantes);
+                buscarEstudiantesPorTaller(_nodo.izquierdo, _taller, ref _listaEstudiantes);//LLAMAR RECURSIVAMENTE AL NODO IZQUIERDO
             }
             if (_nodo.derecho != null)
             {
-                buscarEstudiantesPorTaller(_nodo.derecho, _taller, ref _listaEstudiantes);
+                buscarEstudiantesPorTaller(_nodo.derecho, _taller, ref _listaEstudiantes);//LLAMAR RECURSIVAMENTE AL NODO DERECHO
             }
         }
 
-        public Estudiante buscarEstudiante()
+        public Estudiante buscarEstudiante()//funcion para buscar estudiante por matricula
         {
             Estudiante estudiante = new Estudiante();
             estudiante.matricula = txtMatriculaBuscar.Text;
 
-            return buscarEstudianteRecursivo(raiz, estudiante);
+            return buscarEstudianteRecursivo(raiz, estudiante);//llamar a la funcion recursiva para buscar el estudiante
         }
 
         public Estudiante buscarEstudianteRecursivo(Estudiante _nodo, Estudiante _buscar)
         {
             int resultComparacionMatriculas = String.Compare(_nodo.matricula, _buscar.matricula, StringComparison.OrdinalIgnoreCase);
 
-            if (resultComparacionMatriculas == 0)
+            if (resultComparacionMatriculas == 0)//si se encontro la matricula
             {
-                return _nodo;
+                return _nodo;//retornar el nodo encontrado
             }
-            else if (resultComparacionMatriculas < 0)
+            else if (resultComparacionMatriculas < 0)//si a es menor que b
             {
-                return buscarEstudianteRecursivo(_nodo.izquierdo, _buscar);
+                return buscarEstudianteRecursivo(_nodo.izquierdo, _buscar);//buscar en el nodo izquierdo
             }
             else
             {
-                return buscarEstudianteRecursivo(_nodo.derecho, _buscar);
+                return buscarEstudianteRecursivo(_nodo.derecho, _buscar);//buscar en el nodo derecho
             }
         }
 
-        public void asignarMateriasEstudiante(Estudiante _nodo)
+        public void asignarMateriasEstudiante(Estudiante _nodo)//metodo para asignar materias a un estudiante
         {
             _nodo.agregarMateria("Matemáticas", 8);
             _nodo.agregarMateria("Historia", 9);
         }
 
-        public void asignarTalleresEstudiante(Estudiante _nodo, talleres item)
+        public void asignarTalleresEstudiante(Estudiante _nodo, talleres item)//metodo para asignar talleres a un estudiante
         {
             _nodo.agregarTaller(item);
         }
 
-        public void promedioEstudiante(Estudiante _nodo)
+        public void promedioEstudiante(Estudiante _nodo)//metodo para calcular el promedio de un estudiante
         {
             double promedio = _nodo.promedioMaterias();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)//boton para buscar estudiante
         {
             estudianteEditar = buscarEstudiante();
             if (estudianteEditar != null)
@@ -395,7 +395,7 @@ namespace ProyectoFinal3
             }
         }
 
-        public void ListarTalleresEstudiante()
+        public void ListarTalleresEstudiante()//metodo para listar talleres inscritos por el estudiante
         {
             lbxTalleresEstudiante.Items.Clear();
             if (estudianteEditar.talleresInscritos.Count > 0)
@@ -407,7 +407,7 @@ namespace ProyectoFinal3
             }
         }
 
-        public void ListarMateriasEstudiante()
+        public void ListarMateriasEstudiante()//metodo para listar materias y calificaciones del estudiante
         {
             lblPromedioEstudiante.Text = string.Empty;
             lbxMateriasEstudiante.Items.Clear();
@@ -421,12 +421,12 @@ namespace ProyectoFinal3
             }
         }
 
-        private void btnAgregarEstudiante_Click(object sender, EventArgs e)
+        private void btnAgregarEstudiante_Click(object sender, EventArgs e)//boton para agregar estudiante
         {
             agregarEstudiante();
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void button1_Click_1(object sender, EventArgs e)//boton para agregar taller al estudiante
         {
             if (cmbTalleres.SelectedItem != null)
             {
@@ -437,20 +437,20 @@ namespace ProyectoFinal3
                     estudianteEditar.agregarTaller(item);
                     ListarTalleresEstudiante();
 
-                    unionTalleresEstudiantes();
+                    unionTalleresEstudiantes();//actualizar los conjuntos
                     InterseccionTalleresEstudiantes();
                     DiferencTalleresEstudiantes();
                 }
             }
         }
 
-        private void cmbOrdenEstudiantes_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbOrdenEstudiantes_SelectedIndexChanged(object sender, EventArgs e)//evento para cambiar el orden de listado de estudiantes
         {
             Enum.TryParse(cmbOrdenEstudiantes.SelectedIndex.ToString(), out ordenEstudiantes);
             ListarEstudiantes();
         }
 
-        private void btnAgregarMateria_Click(object sender, EventArgs e)
+        private void btnAgregarMateria_Click(object sender, EventArgs e)//boton para agregar materia al catalogo
         {
             bool contieneItem = Enum.IsDefined(typeof(materias), txtNombreMateria.Text);
             if (!contieneItem)
@@ -461,7 +461,7 @@ namespace ProyectoFinal3
             }
         }
 
-        private void btnAgregarMateriaEstudiante_Click(object sender, EventArgs e)
+        private void btnAgregarMateriaEstudiante_Click(object sender, EventArgs e)//boton para agregar materia al estudiante
         {
             if (cmbMaterias.SelectedItem != null)
             {
@@ -473,7 +473,7 @@ namespace ProyectoFinal3
             }
         }
 
-        private void lbxMateriasEstudiante_DoubleClick(object sender, EventArgs e)
+        private void lbxMateriasEstudiante_DoubleClick(object sender, EventArgs e)//evento para modificar la calificacion de una materia al dar doble click
         {
             if (lbxMateriasEstudiante.SelectedItem != null)
             {
@@ -499,7 +499,7 @@ namespace ProyectoFinal3
 
 
 
-        public DialogResult m_inputBox(string _title, string _promptText, ref string _value)
+        public DialogResult m_inputBox(string _title, string _promptText, ref string _value)//funcion para mostrar un cuadro de dialogo personalizado
         {
             System.Windows.Forms.Form form = new System.Windows.Forms.Form();
             System.Windows.Forms.Label label = new System.Windows.Forms.Label();
